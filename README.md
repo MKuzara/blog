@@ -7,5 +7,6 @@ Copy the **.env_example** file to **.env** file and set the **ConnectionStrings_
 ## How to run the application
 Go to the Blog.API directory and run the following command:
 
+    dotnet ef database update
     dotnet run --launch-profile https
 Now open your browser and navigate to the **https://localhost:7216/swagger/index.html** URL.

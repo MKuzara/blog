@@ -13,8 +13,12 @@ namespace Blog.API.Mappings
         public AutoMapperProfiles()
         {
             CreateMap<BlogPost, BlogPostDTO>().ReverseMap();
+            CreateMap<BlogPost, BlogPostDetailsDTO>().ReverseMap();
             CreateMap<BlogPost, AddBlogPostDTO>().ReverseMap();
             CreateMap<BlogPost, UpdateBlogPostDTO>().ReverseMap();
+
+            CreateMap<User, UserProfileDTO>().ReverseMap();
+            CreateMap<User, UserInfoDto>().ReverseMap();
         }
     }
 }

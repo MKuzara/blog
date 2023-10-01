@@ -19,6 +19,7 @@ builder.Services.AddDbContext<BlogAPIDbContext>(options =>
 );
 
 builder.Services.AddScoped<IBlogPostRepository, BlogPostRepository>();
+builder.Services.AddScoped<IUserRepository, UserRespository>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 

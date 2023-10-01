@@ -13,5 +13,7 @@ namespace Blog.API.Models.Domain
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        public List<BlogPost> BlogPosts { get; set; }
     }
 }

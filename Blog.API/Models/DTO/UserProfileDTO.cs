@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace Blog.API.Models.DTO
 {
-    public class UserDTO
+    public class UserProfileDTO
     {
-        public Guid Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
 

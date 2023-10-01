@@ -46,14 +46,18 @@ namespace Blog.API.Repositiories
 
         public async Task<List<BlogPost>> GetListAsync()
         {
-            var blogPostList = await dbContext.BlogPosts.ToListAsync();
+            var blogPostList = await dbContext.BlogPosts
+                .Include(x => x.User)
+                .ToListAsync();
 
             return blogPostList;
         }
 
         public async Task<BlogPost?> UpdatedAsync(Guid id, BlogPost blogPost)
         {
-            var existingBlogPost = await dbContext.BlogPosts.FirstOrDefaultAsync(x => x.Id == id);
+            var existingBlogPost = await dbContext.BlogPosts
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if(existingBlogPost == null) {
                 return null;

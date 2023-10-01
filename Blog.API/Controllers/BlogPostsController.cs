@@ -6,6 +6,7 @@ using AutoMapper;
 using Blog.API.Models.Domain;
 using Blog.API.Models.DTO;
 using Blog.API.Repositiories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.API.Controllers
@@ -26,7 +27,7 @@ namespace Blog.API.Controllers
         // GET Blog Posts
         // GET: /api/blogposts
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> GetList()
         {
             // Get list of the blog posts from the DB
             var blogPostList = await blogPostRepository.GetListAsync();
@@ -49,28 +50,30 @@ namespace Blog.API.Controllers
                 return NotFound();
             }
              // Map the blogpost model to a DTO
-            var blogPostDto = mapper.Map<BlogPostDTO>(blogPost);
+            var blogPostDto = mapper.Map<BlogPostDetailsDTO>(blogPost);
 
             return Ok(blogPostDto);
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] AddBlogPostDTO addBlogPostDTO)
         {
             // Map the DTO to a blogpost model
             var blogPost = mapper.Map<BlogPost>(addBlogPostDTO);
-
+            
             // Create a blog post
             blogPost = await blogPostRepository.CreateAsync(blogPost);
 
             // Map the blogpost model to a DTO
-            var blogPostDTO = mapper.Map<BlogPostDTO>(blogPost);
+            var blogPostDTO = mapper.Map<BlogPostDetailsDTO>(blogPost);
 
             return CreatedAtAction(nameof(GetById), new { id = blogPost.Id }, blogPostDTO);
         }
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBlogPostDTO updateBlogPostDTO)
         {
             // Map the DTO to a blogpost model
@@ -85,13 +88,14 @@ namespace Blog.API.Controllers
             }
 
             // Map the blogpost model to a DTO
-            var blogPostDTO = mapper.Map<BlogPostDTO>(blogPost);
+            var blogPostDTO = mapper.Map<BlogPostDetailsDTO>(blogPost);
 
             return Ok(blogPostDTO);
         }
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             // Delete the blogpost object

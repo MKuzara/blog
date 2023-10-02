@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AutoMapper;
+using Blog.API.ActionFilter;
 using Blog.API.Models.Domain;
 using Blog.API.Models.DTO;
 using Blog.API.Repositiories;
@@ -64,13 +65,14 @@ namespace Blog.API.Controllers
 
         [HttpPost]
         [Authorize]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddBlogPostDTO addBlogPostDTO)
         {
             // Map the DTO to a blogpost model
             var blogPost = mapper.Map<BlogPost>(addBlogPostDTO);
 
             // check if user the authenticated user has correct informaiton
-            if (this.User.Identity.Name == null) {
+            if (this.User.Identity?.Name == null) {
                 return BadRequest("Something went wrong.");
             }
             // Get user by ID
@@ -93,6 +95,7 @@ namespace Blog.API.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [Authorize]
+        [ValidateModel]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBlogPostDTO updateBlogPostDTO)
         {
             var existingBlogPost = await blogPostRepository.GetByIdAsync(id);

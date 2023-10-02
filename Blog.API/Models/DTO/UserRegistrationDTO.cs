@@ -9,6 +9,8 @@ namespace Blog.API.Models.DTO
     public class UserRegistrationDTO
     {
         [Required]
+        [MaxLength(20)]
+        [MinLength(6)]
         public string Username { get; set; }
 
         [Required]
@@ -16,6 +18,8 @@ namespace Blog.API.Models.DTO
         public string Email { get; set; }
 
         [Required]
+        [MaxLength(20)]
+        [MinLength(6)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }

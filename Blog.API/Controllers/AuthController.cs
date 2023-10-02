@@ -8,6 +8,7 @@ using Blog.API.Models.DTO;
 using Blog.API.Repositiories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Blog.API.ActionFilter;
 
 namespace Blog.API.Controllers
 {
@@ -25,6 +26,7 @@ namespace Blog.API.Controllers
 
         [HttpPost]
         [Route("Register")]
+        [ValidateModel]
         public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userRegistrationDTO)
         {
             var user = new User
@@ -43,6 +45,7 @@ namespace Blog.API.Controllers
 
         [HttpPost]
         [Route("Login")]
+        [ValidateModel]
         public async Task<IActionResult> Login([FromBody] UserLoginDTO userLoginDTO)
         {
             var user = await userManager.FindByNameAsync(userLoginDTO.Username);

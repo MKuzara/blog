@@ -9,6 +9,8 @@ namespace Blog.API.Models.DTO
     public class UserLoginDTO
     {
         [Required]
+        [MaxLength(20)]
+        [MinLength(6)]
         public string Username { get; set; }
 
         [Required]

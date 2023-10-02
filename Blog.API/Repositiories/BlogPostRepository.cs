@@ -45,15 +45,19 @@ namespace Blog.API.Repositiories
                 .Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<List<BlogPost>> GetListAsync()
+        public async Task<List<BlogPost>> GetListAsync(string? filter, int pageNumber = 1, int pageSize = 10)
         {
-            var blogPostList = await dbContext.BlogPosts
+            var blogPostList = dbContext.BlogPosts
                 .Include(x => x.User)
-                .ToListAsync();
-
-            return blogPostList;
+                .AsQueryable();
+            
+            if (!string.IsNullOrWhiteSpace(filter)) {
+                blogPostList = blogPostList.Where(x => x.Title.Contains(filter));
+            }
+            var skipResults = (pageNumber - 1) * pageSize;
+            return await blogPostList.Skip(skipResults).Take(pageSize).ToListAsync();
         }
-
+        
         public async Task<BlogPost?> UpdatedAsync(BlogPost existingBlogPost, BlogPost blogPost)
         {
             if(existingBlogPost == null) {

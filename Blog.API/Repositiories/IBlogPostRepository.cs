@@ -8,7 +8,7 @@ namespace Blog.API.Repositiories
 {
     public interface IBlogPostRepository
     {
-        Task<List<BlogPost>> GetListAsync();
+        Task<List<BlogPost>> GetListAsync(string? filter, int pageNumber = 1, int pageSize = 10);
 
         Task<BlogPost?> GetByIdAsync(Guid id);
 

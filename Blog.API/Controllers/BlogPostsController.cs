@@ -32,10 +32,10 @@ namespace Blog.API.Controllers
         // GET Blog Posts
         // GET: /api/blogposts
         [HttpGet]
-        public async Task<IActionResult> GetList()
+        public async Task<IActionResult> GetList([FromQuery] string? filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             // Get list of the blog posts from the DB
-            var blogPostList = await blogPostRepository.GetListAsync();
+            var blogPostList = await blogPostRepository.GetListAsync(filter, pageNumber, pageSize);
 
             // Map the blogpost model to a DTO
             var blogPostsDto = mapper.Map<List<BlogPostDTO>>(blogPostList);
@@ -139,7 +139,7 @@ namespace Blog.API.Controllers
             {
                 // Delete the blogpost object
                 var deletedBlogPost = await blogPostRepository.DeleteAsync(id);
-                
+
                 // Return 204 - No Content
                 return NoContent();
 

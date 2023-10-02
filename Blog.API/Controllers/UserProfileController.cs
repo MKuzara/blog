@@ -24,8 +24,13 @@ namespace Blog.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserProfle(string username)
+        [Authorize]
+        public async Task<IActionResult> GetUserProfle()
         {
+            if (this.User.Identity?.Name == null) {
+                return BadRequest("Could not find the authenticated user.");
+            }
+            var username = this.User.Identity.Name;
             var userProfile = await userRepository.GetUserProfileAsync(username);
 
             if(userProfile == null) {
@@ -34,13 +39,6 @@ namespace Blog.API.Controllers
 
             var userProfileDTO = mapper.Map<UserProfileDTO>(userProfile);
             return Ok(userProfileDTO);
-        }
-
-        [HttpPut]
-        [Authorize]
-        public async Task<IActionResult> UpdateProfileInformation([FromBody] string email)
-        {
-            return Ok();
         }
 
     }

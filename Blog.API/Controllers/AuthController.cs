@@ -30,20 +30,15 @@ namespace Blog.API.Controllers
             var user = new User
             {
                 UserName = userRegistrationDTO.Username,
-                Email = userRegistrationDTO.Email
+                Email = userRegistrationDTO.Email,
             };
-            if(userRegistrationDTO.Password != userRegistrationDTO.Password2) {
-                return BadRequest("Provided passwords do not much.");
-            }
-            var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.UserName));
 
             var identityResult = await userManager.CreateAsync(user, userRegistrationDTO.Password);
 
             if(identityResult.Succeeded) {
                 return Ok("User was registered! Please login.");
             }
-            return BadRequest("Something went wrong.");
+            return BadRequest(identityResult.Errors);
         }
 
         [HttpPost]
@@ -59,6 +54,8 @@ namespace Blog.API.Controllers
 
             var checkPasswordResult = await userManager.CheckPasswordAsync(user, userLoginDTO.Password);
             if(checkPasswordResult) {
+
+                // Create username claim so that it can be accessed in the controllers when authenticated
                 var claims = new List<Claim>() {
                     new Claim(ClaimTypes.Name, user.UserName)
                 };

@@ -21,7 +21,9 @@ namespace Blog.API.Controllers
         private readonly IUserRepository userRepository;
         private readonly IAuthorizationService authorizationService;
 
-        public BlogPostsController(IMapper mapper, IBlogPostRepository blogPostRepository, IUserRepository userRepository, IAuthorizationService authorizationService)
+        public BlogPostsController(
+            IMapper mapper, IBlogPostRepository blogPostRepository, 
+            IUserRepository userRepository, IAuthorizationService authorizationService)
         {
             this.mapper = mapper;
             this.blogPostRepository = blogPostRepository;
@@ -66,6 +68,11 @@ namespace Blog.API.Controllers
         {
             // Map the DTO to a blogpost model
             var blogPost = mapper.Map<BlogPost>(addBlogPostDTO);
+
+            // check if user the authenticated user has correct informaiton
+            if (this.User.Identity.Name == null) {
+                return BadRequest("Something went wrong.");
+            }
             // Get user by ID
             var user = await userRepository.GetUserByUserName(this.User.Identity.Name);
 

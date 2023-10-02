@@ -18,9 +18,5 @@ namespace Blog.API.Models.DTO
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password2 { get; set; }
     }
 }

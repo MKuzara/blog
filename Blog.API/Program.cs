@@ -51,7 +51,7 @@ builder.Services.AddDbContext<BlogAPIDbContext>(options =>
 
 builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
-    .AddTokenProvider<DataProtectorTokenProvider<User>>("BlogAPI")
+    .AddTokenProvider<DataProtectorTokenProvider<User>>("Blog.API")
     .AddEntityFrameworkStores<BlogAPIDbContext>()
     .AddDefaultTokenProviders();
 
@@ -89,6 +89,7 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.AddSingleton<IAuthorizationHandler, BlogPostOwnerAuthorizationHandler>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
+
 
 var app = builder.Build();
 

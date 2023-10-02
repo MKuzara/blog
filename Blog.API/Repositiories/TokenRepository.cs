@@ -19,7 +19,7 @@ namespace Blog.API.Repositiories
             this.configuration = configuration;
         }
 
-        public string CreateJWTToken(User user)
+        public string CreateJWTToken(User user, List<Claim> claims)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
 
@@ -28,6 +28,7 @@ namespace Blog.API.Repositiories
             var token = new JwtSecurityToken(
                 configuration["Jwt:Issuer"],
                 configuration["Jwt:Audience"],
+                claims,
                 expires: DateTime.Now.AddMinutes(15),
                 signingCredentials: credentials
             );

@@ -14,7 +14,7 @@ namespace Blog.API.Repositiories
 
         Task<BlogPost> CreateAsync(BlogPost blogPost);
 
-        Task<BlogPost?> UpdatedAsync(Guid id, BlogPost blogPost);
+        Task<BlogPost?> UpdatedAsync(BlogPost exisingBlogPost, BlogPost blogPost);
 
         Task<BlogPost?> DeleteAsync(Guid id);
     }

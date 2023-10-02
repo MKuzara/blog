@@ -9,5 +9,7 @@ namespace Blog.API.Repositiories
     public interface IUserRepository
     {
         Task<User?> GetUserProfileAsync(string username);
+
+        Task<User> GetUserByUserName(string username);
     }
 }

@@ -29,5 +29,10 @@ namespace Blog.API.Repositiories
 
             return user;
         }
+
+        public async Task<User?> GetUserByUserName(string username)
+        {
+            return await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == username);
+        }
     }
 }

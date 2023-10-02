@@ -18,12 +18,14 @@ namespace Blog.API.Controllers
     {
         private readonly IMapper mapper;
         private readonly IBlogPostRepository blogPostRepository;
+        private readonly IUserRepository userRepository;
         private readonly IAuthorizationService authorizationService;
 
-        public BlogPostsController(IMapper mapper, IBlogPostRepository blogPostRepository, IAuthorizationService authorizationService)
+        public BlogPostsController(IMapper mapper, IBlogPostRepository blogPostRepository, IUserRepository userRepository, IAuthorizationService authorizationService)
         {
             this.mapper = mapper;
             this.blogPostRepository = blogPostRepository;
+            this.userRepository = userRepository;
             this.authorizationService = authorizationService;
         }
 
@@ -43,7 +45,6 @@ namespace Blog.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             // Get blog post from the DB
@@ -54,25 +55,9 @@ namespace Blog.API.Controllers
             {
                 return NotFound();
             }
+            var blogPostDto = mapper.Map<BlogPostDetailsDTO>(blogPost);
 
-            var authorizationResult = await authorizationService.AuthorizeAsync(User, blogPost, "ObjectOwner");
-
-            if (authorizationResult.Succeeded)
-            {
-                // Map the blogpost model to a DTO
-                var blogPostDto = mapper.Map<BlogPostDetailsDTO>(blogPost);
-
-                return Ok(blogPostDto);
-            }
-            else if (User.Identity.IsAuthenticated)
-            {
-                return new ForbidResult();
-            }
-            else
-            {
-                return new ChallengeResult();
-            }
-            
+            return Ok(blogPostDto);
         }
 
         [HttpPost]
@@ -81,7 +66,14 @@ namespace Blog.API.Controllers
         {
             // Map the DTO to a blogpost model
             var blogPost = mapper.Map<BlogPost>(addBlogPostDTO);
+            // Get user by ID
+            var user = await userRepository.GetUserByUserName(this.User.Identity.Name);
 
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            blogPost.UserId = user.Id;
             // Create a blog post
             blogPost = await blogPostRepository.CreateAsync(blogPost);
 
@@ -96,22 +88,37 @@ namespace Blog.API.Controllers
         [Authorize]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBlogPostDTO updateBlogPostDTO)
         {
-            // Map the DTO to a blogpost model
-            var blogPost = mapper.Map<BlogPost>(updateBlogPostDTO);
+            var existingBlogPost = await blogPostRepository.GetByIdAsync(id);
 
-            // update the blogpost object
-            blogPost = await blogPostRepository.UpdatedAsync(id, blogPost);
+            var authorizationResult = await authorizationService.AuthorizeAsync(this.User, existingBlogPost, "ObjectOwner");
 
-            // Handle 404 - Not Found
-            if (blogPost == null)
+            if (authorizationResult.Succeeded)
             {
-                return NotFound();
+                // Map the DTO to a blogpost model
+                var blogPost = mapper.Map<BlogPost>(updateBlogPostDTO);
+                // update the blogpost object
+                blogPost = await blogPostRepository.UpdatedAsync(existingBlogPost, blogPost);
+
+                // Handle 404 - Not Found
+                if (blogPost == null)
+                {
+                    return NotFound();
+                }
+
+                // Map the blogpost model to a DTO
+                var blogPostDTO = mapper.Map<BlogPostDetailsDTO>(blogPost);
+
+                return Ok(blogPostDTO);
+
             }
-
-            // Map the blogpost model to a DTO
-            var blogPostDTO = mapper.Map<BlogPostDetailsDTO>(blogPost);
-
-            return Ok(blogPostDTO);
+            else if (this.User.Identity.IsAuthenticated)
+            {
+                return new ForbidResult();
+            }
+            else
+            {
+                return new ChallengeResult();
+            }
         }
 
         [HttpDelete]
@@ -119,16 +126,28 @@ namespace Blog.API.Controllers
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            // Delete the blogpost object
-            var blogPost = await blogPostRepository.DeleteAsync(id);
+            var blogPost = await blogPostRepository.GetByIdAsync(id);
 
             // Handle 404 - Not Found
-            if (blogPost == null)
-            {
+            if (blogPost == null){
                 return NotFound();
             }
-            // Return 204 - No Content
-            return NoContent();
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(this.User, blogPost, "ObjectOwner");
+
+            if (authorizationResult.Succeeded)
+            {
+                // Delete the blogpost object
+                var deletedBlogPost = await blogPostRepository.DeleteAsync(id);
+                
+                // Return 204 - No Content
+                return NoContent();
+
+            } else if (this.User.Identity.IsAuthenticated) {
+                return new ForbidResult();
+            } else {
+                return new ChallengeResult();
+            }
         }
     }
 }

@@ -59,8 +59,11 @@ namespace Blog.API.Controllers
 
             var checkPasswordResult = await userManager.CheckPasswordAsync(user, userLoginDTO.Password);
             if(checkPasswordResult) {
-
-                var jwtToken = tokenRepository.CreateJWTToken(user);
+                var claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, user.UserName)
+                };
+                
+                var jwtToken = tokenRepository.CreateJWTToken(user, claims);
 
                 var response = new UserLoginResponseDTO{
                     JwtToken = jwtToken

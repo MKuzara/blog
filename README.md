@@ -7,19 +7,24 @@ Assignment for ASP .Net Core.
 
 ## How to configure the application
 
-Copy the **.env_example** file to **.env** file and set the **ConnectionStrings__BlogConnectionString** and **JWT__Key** parameters to your values.
+Copy the **.env_example** file to **.env** file and set the following parameters:
 
   
+    ConnectionStrings__BlogConnectionString
+    
+    JWT__Key
+
+Make sure that the **.env** file is located under the "Blog.API" directory.
 
 ## How to run the application
 
-Go to the Blog.API directory and run the following command:
+Go to the Blog.API directory and run the following commands:
 
-  
+    dotnet build
 
-dotnet ef database update
+    dotnet ef database update
 
-dotnet run --launch-profile https
+    dotnet run --launch-profile https
 
 Now open your browser and navigate to the **https://localhost:7216/swagger** URL.
 
@@ -45,7 +50,7 @@ If the authentication is successful you will be returned with a token. You can u
 
   
 
-Bearer **## TOKEN_VALUE ##**
+    Bearer TOKEN_VALUE
 
   
 

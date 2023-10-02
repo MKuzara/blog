@@ -12,7 +12,7 @@ namespace Blog.API.Models.Domain
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         // navigation property
         public User User { get; set; }

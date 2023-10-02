@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AutoMapper;
 using Blog.API.Models.Domain;
@@ -17,11 +18,13 @@ namespace Blog.API.Controllers
     {
         private readonly IMapper mapper;
         private readonly IBlogPostRepository blogPostRepository;
+        private readonly IAuthorizationService authorizationService;
 
-        public BlogPostsController(IMapper mapper, IBlogPostRepository blogPostRepository)
+        public BlogPostsController(IMapper mapper, IBlogPostRepository blogPostRepository, IAuthorizationService authorizationService)
         {
             this.mapper = mapper;
             this.blogPostRepository = blogPostRepository;
+            this.authorizationService = authorizationService;
         }
 
         // GET Blog Posts
@@ -40,19 +43,36 @@ namespace Blog.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             // Get blog post from the DB
             var blogPost = await blogPostRepository.GetByIdAsync(id);
-            
+
             // Gandle 404 - Not Found
-            if (blogPost == null) {
+            if (blogPost == null)
+            {
                 return NotFound();
             }
-             // Map the blogpost model to a DTO
-            var blogPostDto = mapper.Map<BlogPostDetailsDTO>(blogPost);
 
-            return Ok(blogPostDto);
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, blogPost, "ObjectOwner");
+
+            if (authorizationResult.Succeeded)
+            {
+                // Map the blogpost model to a DTO
+                var blogPostDto = mapper.Map<BlogPostDetailsDTO>(blogPost);
+
+                return Ok(blogPostDto);
+            }
+            else if (User.Identity.IsAuthenticated)
+            {
+                return new ForbidResult();
+            }
+            else
+            {
+                return new ChallengeResult();
+            }
+            
         }
 
         [HttpPost]
@@ -61,7 +81,7 @@ namespace Blog.API.Controllers
         {
             // Map the DTO to a blogpost model
             var blogPost = mapper.Map<BlogPost>(addBlogPostDTO);
-            
+
             // Create a blog post
             blogPost = await blogPostRepository.CreateAsync(blogPost);
 
@@ -83,7 +103,8 @@ namespace Blog.API.Controllers
             blogPost = await blogPostRepository.UpdatedAsync(id, blogPost);
 
             // Handle 404 - Not Found
-            if(blogPost == null) {
+            if (blogPost == null)
+            {
                 return NotFound();
             }
 
@@ -100,9 +121,10 @@ namespace Blog.API.Controllers
         {
             // Delete the blogpost object
             var blogPost = await blogPostRepository.DeleteAsync(id);
-            
+
             // Handle 404 - Not Found
-            if(blogPost == null) {
+            if (blogPost == null)
+            {
                 return NotFound();
             }
             // Return 204 - No Content

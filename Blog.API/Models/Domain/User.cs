@@ -9,11 +9,12 @@ namespace Blog.API.Models.Domain
 {
     public class User : IdentityUser
     {
-        public Guid Id { get; set; }
-        [Required]
-        [EmailAddress]
+        // [Key]
+        // public Guid Id { get; set; }
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
+        // navigation property
         public List<BlogPost> BlogPosts { get; set; }
     }
 }

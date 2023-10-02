@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Blog.API.Models.DTO;
 using Blog.API.Repositiories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.API.Controllers
@@ -36,6 +37,7 @@ namespace Blog.API.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> UpdateProfileInformation([FromBody] string email)
         {
             return Ok();
